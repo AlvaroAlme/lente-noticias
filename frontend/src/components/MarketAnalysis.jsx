@@ -4,9 +4,21 @@ import { Scale, TrendingUp, AlertTriangle, Eye } from "lucide-react";
 import { api } from "../api/client.js";
 
 const SIGNAL = {
-  Oportunidad: { tone: "low", icon: TrendingUp },
-  Precaución: { tone: "high", icon: AlertTriangle },
-  Vigilar: { tone: "medium", icon: Eye },
+  Oportunidad: {
+    tone: "low",
+    icon: TrendingUp,
+    meaning: "Tendencia positiva sostenida en los últimos cierres.",
+  },
+  Precaución: {
+    tone: "high",
+    icon: AlertTriangle,
+    meaning: "Caída o volatilidad notable: conviene vigilarlo de cerca.",
+  },
+  Vigilar: {
+    tone: "medium",
+    icon: Eye,
+    meaning: "Sin una señal clara todavía, ni al alza ni a la baja.",
+  },
 };
 
 export function MarketAnalysis() {
@@ -34,6 +46,17 @@ export function MarketAnalysis() {
           a un profesional cualificado.
         </span>
       </p>
+
+      <ul className="signal-legend">
+        {Object.entries(SIGNAL).map(([label, { tone, icon: Icon, meaning }]) => (
+          <li key={label}>
+            <span className="signal-chip" data-tone={tone}>
+              <Icon size={12} strokeWidth={2.5} /> {label}
+            </span>
+            <span>{meaning}</span>
+          </li>
+        ))}
+      </ul>
 
       {state.loading && <p className="muted">Analizando la sesión de mercado…</p>}
       {state.error && <p className="error">No se pudo generar el análisis: {state.error}</p>}

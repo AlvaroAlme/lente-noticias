@@ -773,6 +773,30 @@ a { color: inherit; }
 .signal-chip[data-tone="high"] { background: var(--high); color: #1c0705; }
 .signal-chip[data-tone="medium"] { background: var(--medium); color: #1a1204; }
 
+/* Leyenda: qué significa cada etiqueta de la lista de oportunidades,
+   para que no haga falta adivinar el criterio detrás de cada aviso. */
+.signal-legend {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--paper-raised) 60%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.signal-legend li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.signal-legend li span:last-child {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 /* ---------- Loading skeleton ---------- */
 .skeleton-block {
   background: linear-gradient(90deg, var(--line) 25%, var(--paper) 50%, var(--line) 75%);

@@ -36,8 +36,15 @@ const SHOPPING_PATTERNS = [
 const LOTTERY_PATTERNS = [
   /\bbonoloto\b/,
   /\beuromillones?\b/,
+  /\beurodreams\b/,
   /\bloter[ií]a(s)?\b/,
-  /\bcup[oó]n(es)?\s+de\s+la\s+once\b/,
+  // Antes exigía la frase exacta "cupón de la once"; un titular real
+  // como "Cupón diario de la ONCE: comprobar sorteo..." tiene una
+  // palabra de por medio y no coincidía. "cupón" ya es lo bastante
+  // específico de lotería como para no necesitar el "de la" exacto.
+  /\bcup[oó]n(es)?\b[^.?!]{0,30}\b(once|sorteo|premio)\b/,
+  /\bcuponazo\b/,
+  /\bsueldazo\b/,
   /\btriplex\b/,
   /\bquiniela\b/,
   /\bquinigol\b/,

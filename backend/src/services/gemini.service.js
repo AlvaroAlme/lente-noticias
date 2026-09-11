@@ -7,6 +7,19 @@ import { upstreamError } from "../utils/upstreamError.js";
 // y cambia la variable de entorno sin tocar código.
 const DEFAULT_MODEL = "gemini-3.6-flash";
 
+// Se ha observado que, sobre todo en modo de salida JSON estructurada
+// (responseSchema), Gemini a veces genera texto en español SIN tildes
+// ni "ñ" (p. ej. "indices", "ultimas", "espanol") aunque el prompt en sí
+// esté bien escrito — es un quirk conocido de generación restringida a
+// un esquema, no un error de nuestro código. Se añade esta instrucción
+// a TODAS las llamadas (en vez de repetirla en cada prompt) para que
+// cualquier función nueva que use callGemini quede cubierta también.
+const SPANISH_SPELLING_REMINDER =
+  "\n\nIMPORTANTE: escribe en español correcto, usando siempre las " +
+  "tildes y la letra 'ñ' donde corresponda (por ejemplo: 'índices', " +
+  "'última', 'presión', 'español', 'máximo', 'caída', no 'indices', " +
+  "'ultima', 'presion', 'espanol', 'maximo', 'caida').";
+
 async function callGemini(prompt, generationConfig) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -20,7 +33,7 @@ async function callGemini(prompt, generationConfig) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
+      contents: [{ parts: [{ text: prompt + SPANISH_SPELLING_REMINDER }] }],
       ...(generationConfig ? { generationConfig } : {}),
     }),
   });
