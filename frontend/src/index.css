@@ -167,6 +167,64 @@ a { color: inherit; }
   text-transform: capitalize;
 }
 
+/* ---------- Search bar (en el masthead) ---------- */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 260px;
+  max-width: 420px;
+  padding: 0.45rem 0.85rem;
+  background: var(--paper-raised);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: border-color 0.15s ease;
+}
+.search-bar:focus-within { border-color: var(--accent); }
+.search-bar-icon { flex: none; color: var(--muted); }
+.search-bar input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.search-bar input::placeholder { color: var(--muted); }
+/* Quita la "x" nativa del input type=search en Chrome/Edge: usamos la
+   nuestra (.search-bar-clear) para que el icono encaje con el resto. */
+.search-bar input::-webkit-search-cancel-button { display: none; }
+.search-bar-clear {
+  flex: none;
+  display: inline-flex;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.1rem;
+}
+.search-bar-clear:hover { color: var(--ink); }
+
+/* ---------- Página de resultados de búsqueda ---------- */
+.search-heading {
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  margin: var(--space-1) 0 var(--space-4);
+  color: var(--ink-soft);
+}
+.search-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) 0;
+  color: var(--muted);
+  text-align: center;
+}
+
 /* ---------- Category nav ---------- */
 .category-tabs {
   display: flex;

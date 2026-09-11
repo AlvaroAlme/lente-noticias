@@ -3,7 +3,15 @@ import { RSS_FEEDS } from "../config/feeds.js";
 import { cached } from "../utils/cache.js";
 import { normalizeAccents } from "../utils/text.js";
 
-const parser = new Parser({ timeout: 15000 });
+// "media:content" es una extensión de espacio de nombres (no estándar
+// RSS básico), así que rss-parser necesita que se lo pidamos
+// explícitamente; "enclosure" sí lo reconoce de fábrica. Entre los dos
+// cubren la imagen de portada en 6 de los 7 medios configurados (BBC
+// Mundo es la excepción: su feed no trae imagen).
+const parser = new Parser({
+  timeout: 15000,
+  customFields: { item: [["media:content", "mediaContent", { keepArray: true }]] },
+});
 
 // Palabras demasiado comunes en español como para servir de "huella"
 // de una noticia. Las descartamos al comparar titulares.
@@ -21,6 +29,12 @@ function significantWords(title) {
     .filter((w) => w.length > 3 && !STOPWORDS.has(w));
 }
 
+function truncate(text, max = 220) {
+  const clean = (text ?? "").replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  return clean.slice(0, max).replace(/\s+\S*$/, "") + "…";
+}
+
 // Descarga y parsea TODOS los feeds RSS configurados en paralelo.
 // Si un feed falla (URL caída, timeout...) lo ignoramos en vez de
 // tumbar toda la función: es mejor mostrar contraste parcial que nada.
@@ -32,6 +46,8 @@ async function fetchAllFeeds() {
         return (parsed.items ?? []).map((item) => ({
           source: feed.source,
           title: (item.title ?? "").replace(/\s+/g, " ").trim(),
+          description: truncate(item.contentSnippet ?? item["content:encodedSnippet"] ?? ""),
+          image: item.enclosure?.url ?? item.mediaContent?.[0]?.$?.url ?? null,
           link: item.link ?? "",
           publishedAt: item.isoDate ?? item.pubDate ?? null,
         }));
@@ -75,4 +91,37 @@ export async function findRelatedCoverage(title, { minScore = 2, limit = 6 } = {
   }
 
   return [...bestPerSource.values()].slice(0, limit);
+}
+
+// Para la sección "Periódicos": los titulares más recientes de CADA
+// medio configurado, agrupados por cabecera en vez de mezclados por
+// tema. Reutiliza el mismo fetch cacheado que el contraste de fuentes
+// (no hace ninguna llamada adicional).
+//
+// Se normaliza cada ítem a la MISMA forma que un artículo de GNews
+// (id/title/description/content/url/image/publishedAt/source) para que
+// el frontend pueda reutilizar NewsCard y la página de Artículo sin
+// tratamiento especial.
+export async function getFeaturedBySource(limitPerSource = 4) {
+  const allItems = await fetchAllFeeds();
+
+  const bySource = new Map();
+  for (const item of allItems) {
+    if (!bySource.has(item.source)) bySource.set(item.source, []);
+    bySource.get(item.source).push(item);
+  }
+
+  return RSS_FEEDS.map(({ source }) => {
+    const articles = (bySource.get(source) ?? []).slice(0, limitPerSource).map((item) => ({
+      id: item.link,
+      title: item.title,
+      description: item.description,
+      content: item.description,
+      url: item.link,
+      image: item.image,
+      publishedAt: item.publishedAt,
+      source: item.source,
+    }));
+    return { source, articles };
+  }).filter((group) => group.articles.length > 0);
 }

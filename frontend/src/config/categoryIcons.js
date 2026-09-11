@@ -9,6 +9,7 @@ import {
   HeartPulse,
   Ticket,
   Star,
+  Newspaper,
 } from "lucide-react";
 
 // Un icono por categoría: ayuda a reconocer la pestaña de un vistazo
@@ -25,4 +26,5 @@ export const CATEGORY_ICONS = {
   health: HeartPulse,
   loteria: Ticket,
   foryou: Star,
+  periodicos: Newspaper,
 };

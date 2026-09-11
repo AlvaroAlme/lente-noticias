@@ -24,6 +24,11 @@
    explícito de que no es asesoramiento financiero.
 5. En **Salud**: aviso recordando que el contenido no sustituye a un
    profesional sanitario, tanto en el listado como en cada noticia.
+6. **Búsqueda libre**: barra de búsqueda en el masthead que consulta GNews
+   por palabra clave (no solo filtra lo ya cargado en pantalla).
+7. **Periódicos**: sección que agrupa los titulares más recientes de cada
+   medio configurado (El País, El Mundo, ABC...) por cabecera, en vez de por
+   tema — reutiliza los mismos feeds RSS del contraste de fuentes.
 
 ## 2. Arquitectura
 

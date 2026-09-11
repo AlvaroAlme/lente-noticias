@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { getTopHeadlines, getLotteryNews, getAIDevNews } from "../services/gnews.service.js";
-import { findRelatedCoverage } from "../services/rss.service.js";
+import { getTopHeadlines, getLotteryNews, getAIDevNews, searchNews } from "../services/gnews.service.js";
+import { findRelatedCoverage, getFeaturedBySource } from "../services/rss.service.js";
 import { CATEGORIES } from "../config/feeds.js";
 
 export const newsRouter = Router();
@@ -12,10 +12,44 @@ const SPECIAL_CATEGORIES = {
   "ia-dev": getAIDevNews,
 };
 
+// IMPORTANTE: estas rutas de un solo segmento ("categories", "search",
+// "periodicos") deben declararse ANTES de "/:category" — Express prueba
+// las rutas en el orden en que se registran, y "/:category" acepta
+// cualquier segmento único, así que si fuera primera capturaría estas
+// peticiones como si "search"/"periodicos" fuesen el nombre de una
+// categoría.
+
 // GET /api/news/categories -> lista de categorías disponibles (para
 // que el frontend construya las pestañas sin hardcodearlas dos veces).
 newsRouter.get("/categories", (req, res) => {
   res.json(CATEGORIES);
+});
+
+// GET /api/news/search?q=... -> búsqueda libre en GNews (barra de
+// búsqueda). A diferencia de las categorías, la query la escribe la
+// persona usuaria.
+newsRouter.get("/search", async (req, res, next) => {
+  try {
+    const { q } = req.query;
+    if (!q || !String(q).trim()) {
+      return res.status(400).json({ error: "Falta el parámetro 'q'" });
+    }
+    const articles = await searchNews(String(q));
+    res.json(articles);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/news/periodicos -> titulares más recientes de cada medio
+// configurado en RSS_FEEDS, agrupados por cabecera (ver rss.service.js).
+newsRouter.get("/periodicos", async (req, res, next) => {
+  try {
+    const groups = await getFeaturedBySource();
+    res.json(groups);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // GET /api/news/:category -> titulares de esa categoría (vía GNews).

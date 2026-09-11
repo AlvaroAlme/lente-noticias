@@ -3,6 +3,8 @@ import { Routes, Route, Link } from "react-router-dom";
 import { MotionConfig } from "framer-motion";
 import { Home } from "./pages/Home.jsx";
 import { Article } from "./pages/Article.jsx";
+import { Search } from "./pages/Search.jsx";
+import { SearchBar } from "./components/SearchBar.jsx";
 
 function formatToday() {
   return new Date().toLocaleDateString("es-ES", {
@@ -51,6 +53,7 @@ export default function App() {
                 <p className="masthead-tagline">Para ver las noticias con más nitidez</p>
               </div>
             </Link>
+            <SearchBar />
             <time className="masthead-date">{today}</time>
           </div>
         </header>
@@ -58,6 +61,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home key={homeKey} />} />
             <Route path="/article" element={<Article />} />
+            <Route path="/buscar" element={<Search />} />
           </Routes>
         </main>
       </div>

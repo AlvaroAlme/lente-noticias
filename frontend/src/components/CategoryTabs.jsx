@@ -56,6 +56,10 @@ export function CategoryTabs({ categories, active, onSelect, favorites, onToggle
         </div>
       )}
 
+      <div className="tab-group">
+        <Tab catKey="periodicos" label="Periódicos" active={active} onSelect={onSelect} />
+      </div>
+
       {ordered.map((cat) => (
         <div className="tab-group" key={cat.key}>
           <Tab catKey={cat.key} label={cat.label} active={active} onSelect={onSelect} />

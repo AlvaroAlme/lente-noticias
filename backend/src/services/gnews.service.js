@@ -117,6 +117,17 @@ export async function getLotteryNews() {
   return articles.filter((a) => isLotteryContent(a) && !isShoppingContent(a));
 }
 
+// Búsqueda libre para la barra de búsqueda: a diferencia de las
+// categorías especiales (loterías, IA y desarrollo), aquí la query la
+// escribe la persona usuaria, así que solo filtramos afiliados/guías de
+// compra — NO lotería, porque si alguien busca explícitamente
+// "bonoloto" sí queremos devolvérsela (para eso está buscando).
+export async function searchNews(query) {
+  const normalized = query.trim().toLowerCase();
+  const articles = await searchGNews(`gnews:search:${normalized}`, query.trim());
+  return articles.filter((a) => !isShoppingContent(a));
+}
+
 // Igual que loterías: "IA y desarrollo" tampoco es una categoría de GNews,
 // así que buscamos por herramientas/términos concretos de IA aplicada a
 // programación (no "inteligencia artificial" a secas, que traería ruido

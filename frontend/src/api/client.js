@@ -35,4 +35,6 @@ export const api = {
     }),
   getMarkets: () => request("/api/markets"),
   getMarketAnalysis: () => request("/api/markets/analysis"),
+  searchNews: (q) => request(`/api/news/search?q=${encodeURIComponent(q)}`),
+  getSources: () => request("/api/news/periodicos"),
 };

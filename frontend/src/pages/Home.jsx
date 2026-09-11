@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { Newspaper } from "lucide-react";
 import { api } from "../api/client.js";
 import { CategoryTabs } from "../components/CategoryTabs.jsx";
 import { NewsCard } from "../components/NewsCard.jsx";
@@ -36,6 +37,7 @@ export function Home() {
   const [active, setActive] = useState(null);
   const [state, setState] = useState({ loading: true, articles: [], error: null });
   const [groups, setGroups] = useState([]);
+  const [sources, setSources] = useState({ loading: true, groups: [], error: null });
 
   useEffect(() => {
     api.getCategories().then(setCategories).catch(() => {});
@@ -62,7 +64,7 @@ export function Home() {
   // ejemplo, si debe mostrar el aviso de salud, sin tener que volver a
   // pedir nada al backend.
   useEffect(() => {
-    if (!active || active === "foryou") return;
+    if (!active || active === "foryou" || active === "periodicos") return;
     let cancelled = false;
     setState({ loading: true, articles: [], error: null });
 
@@ -124,6 +126,24 @@ export function Home() {
     };
   }, [active, favorites, categories]);
 
+  // Modo "Periódicos": una sola llamada al backend, que ya devuelve los
+  // titulares agrupados por cabecera (vía RSS) — a diferencia de "Tu
+  // enfoque", aquí no hace falta pedir cada grupo por separado.
+  useEffect(() => {
+    if (active !== "periodicos") return;
+    let cancelled = false;
+    setSources({ loading: true, groups: [], error: null });
+
+    api
+      .getSources()
+      .then((groups) => !cancelled && setSources({ loading: false, groups, error: null }))
+      .catch((err) => !cancelled && setSources({ loading: false, groups: [], error: err.message }));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [active]);
+
   function openArticle(article) {
     navigate("/article", { state: { article } });
   }
@@ -167,6 +187,24 @@ export function Home() {
                 </section>
               );
             })}
+          </motion.div>
+        ) : active === "periodicos" ? (
+          <motion.div key="periodicos" variants={fadeVariants} initial="initial" animate="animate" exit="exit">
+            {sources.loading && <MosaicSkeleton count={3} />}
+            {sources.error && <p className="error">No se pudieron cargar los periódicos: {sources.error}</p>}
+            {sources.groups.map((group) => (
+              <section key={group.source} className="signal-section">
+                <h2 className="signal-heading">
+                  <Newspaper size={14} strokeWidth={2.5} aria-hidden="true" />
+                  {group.source}
+                </h2>
+                <div className="news-grid">
+                  {group.articles.map((article) => (
+                    <NewsCard key={article.id} article={article} onOpen={openArticle} />
+                  ))}
+                </div>
+              </section>
+            ))}
           </motion.div>
         ) : (
           <motion.div key={active} variants={fadeVariants} initial="initial" animate="animate" exit="exit">

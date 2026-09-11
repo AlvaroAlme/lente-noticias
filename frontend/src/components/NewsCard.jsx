@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { timeAgo } from "../utils/format.js";
 
@@ -17,6 +18,10 @@ import { timeAgo } from "../utils/format.js";
 export function NewsCard({ article, onOpen, size = "normal", variants }) {
   const ago = timeAgo(article.publishedAt);
   const isLarge = size === "hero" || size === "wide";
+  // Algunas cabeceras protegen sus imágenes contra hotlinking (403 al
+  // cargarlas desde otro dominio) — en vez de dejar el icono roto del
+  // navegador, ocultamos la imagen y la tarjeta cae a su diseño sin foto.
+  const [imgBroken, setImgBroken] = useState(false);
 
   return (
     <motion.article
@@ -26,7 +31,9 @@ export function NewsCard({ article, onOpen, size = "normal", variants }) {
       whileHover={{ y: -2 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
     >
-      {article.image && <img src={article.image} alt="" loading="lazy" />}
+      {article.image && !imgBroken && (
+        <img src={article.image} alt="" loading="lazy" onError={() => setImgBroken(true)} />
+      )}
       <div className="news-card-body">
         <span className="byline">
           {article.source}
