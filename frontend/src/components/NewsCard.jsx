@@ -13,8 +13,8 @@ export function NewsCard({ article, onOpen, size = "normal" }) {
     <motion.article
       className={`news-card news-card-${size}`}
       onClick={() => onOpen(article)}
-      whileHover={{ y: -3 }}
-      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+      whileHover={{ y: -2 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
     >
       {article.image && <img src={article.image} alt="" loading="lazy" />}
       <div className="news-card-body">

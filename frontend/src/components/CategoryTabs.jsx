@@ -22,7 +22,7 @@ function Tab({ catKey, label, active, onSelect }) {
         <motion.span
           layoutId="tab-indicator"
           className="tab-indicator"
-          transition={{ type: "spring", stiffness: 500, damping: 40 }}
+          transition={{ type: "spring", stiffness: 300, damping: 34 }}
         />
       )}
     </button>
