@@ -15,11 +15,22 @@ const parser = new Parser({
 
 // Palabras demasiado comunes en español como para servir de "huella"
 // de una noticia. Las descartamos al comparar titulares.
+//
+// El segundo bloque (gran/dónde/cuándo/días de la semana/horario...) se
+// añadió tras detectar en producción falsos positivos muy concretos:
+// una etapa ciclista contrastada con un Gran Premio de F1 solo por
+// compartir "horario" y "dónde", o "El Gran Wyoming" contrastado con
+// "Gran Premio de España" solo por la palabra "gran". Son palabras que
+// pasan el filtro de longitud (>3) pero no dicen nada del TEMA de la
+// noticia — aparecen igual en portadas de cualquier sección.
 const STOPWORDS = new Set([
   "el", "la", "los", "las", "un", "una", "unos", "unas", "de", "del",
   "en", "y", "a", "que", "por", "con", "para", "su", "sus", "es", "se",
   "al", "lo", "como", "más", "pero", "sobre", "entre", "ya", "tras",
   "este", "esta", "estos", "estas", "sin", "no", "si", "o", "u", "e",
+  "gran", "donde", "cuando", "hoy", "ayer", "manana", "ver", "online",
+  "television", "horario", "horarios", "lunes", "martes", "miercoles",
+  "jueves", "viernes", "sabado", "domingo",
 ]);
 
 function significantWords(title) {
@@ -68,7 +79,13 @@ async function fetchAllFeeds() {
 // Esto es una heurística simple (no NLP real) pero suficiente para un
 // proyecto de este tamaño: es transparente, explicable, y no depende
 // de ninguna API de pago para "entender" el texto.
-export async function findRelatedCoverage(title, { minScore = 2, limit = 6 } = {}) {
+//
+// minScore=3 (antes 2), calibrado contra datos reales: las coincidencias
+// genuinas (misma noticia en varios medios) puntúan 5-8 en producción;
+// las falsas coincidencias detectadas puntuaban exactamente 2. Subir el
+// umbral a 3 deja un margen de seguridad amplio sin arriesgar aciertos
+// reales, que quedan muy por encima.
+export async function findRelatedCoverage(title, { minScore = 3, limit = 6 } = {}) {
   const targetWords = new Set(significantWords(title));
   if (targetWords.size === 0) return [];
 
