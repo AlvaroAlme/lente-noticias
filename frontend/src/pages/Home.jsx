@@ -129,7 +129,7 @@ export function Home() {
   }
 
   return (
-    <div className="page">
+    <div className="page page-home">
       <CategoryTabs
         categories={categories}
         active={active}
@@ -175,9 +175,13 @@ export function Home() {
             {!state.loading && !state.error && (
               <motion.div className="news-mosaic" variants={stagger} initial="initial" animate="animate">
                 {state.articles.map((article, i) => (
-                  <motion.div key={article.id} variants={fadeVariants}>
-                    <NewsCard article={article} onOpen={openArticle} size={sizeFor(i)} />
-                  </motion.div>
+                  <NewsCard
+                    key={article.id}
+                    article={article}
+                    onOpen={openArticle}
+                    size={sizeFor(i)}
+                    variants={fadeVariants}
+                  />
                 ))}
               </motion.div>
             )}

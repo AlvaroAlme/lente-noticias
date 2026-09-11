@@ -36,6 +36,11 @@
   --space-4: 1.8rem;
   --space-5: 2.8rem;
   --space-6: 4rem;
+
+  /* Ancho de la cabecera y de la portada (mosaico): crece de forma
+     fluida en pantallas grandes en vez de quedarse fijo en 1040px —
+     ver .page-home para el razonamiento completo. */
+  --width-wide: clamp(1040px, 82vw, 1800px);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -114,7 +119,7 @@ a { color: inherit; }
   -webkit-backdrop-filter: var(--blur);
 }
 .masthead-inner {
-  max-width: 1040px;
+  max-width: var(--width-wide);
   margin: 0 auto;
   padding: var(--space-4);
   display: flex;
@@ -227,6 +232,18 @@ a { color: inherit; }
   max-width: 1040px;
   margin: 0 auto;
   padding: var(--space-5) var(--space-4) var(--space-6);
+}
+
+/* La portada (mosaico de noticias) sí debe aprovechar pantallas grandes:
+   en un monitor de 27"+ (2560px+), un tope fijo de 1040px deja las
+   tarjetas diminutas en el centro con muchísimo margen vacío alrededor.
+   clamp() crece de forma fluida con el viewport, entre el ancho de
+   siempre (portátiles/monitores normales) y un tope razonable, en vez
+   de saltar de golpe en un breakpoint. El artículo (prosa) NO usa esta
+   clase: el texto largo sí se lee mejor en una columna más estrecha,
+   incluso en pantallas grandes. */
+.page-home {
+  max-width: var(--width-wide);
 }
 
 /* ---------- "Tus señales" sections ---------- */
